@@ -40,7 +40,7 @@ if(multifile) {
 var isLiquid = (pageMode.indexOf('liquid') != -1), flip = (pageMode.indexOf('flip') != -1) && !multifile;
 var arrowNav = true;
 var lazyLoad = true;
-var scaleMode = 'none_desktop';
+var scaleMode = 'best_all';
 var webAppType = '';
 var useTracker = false;
 var shareInfo = {btns:[], align:"left"};
@@ -938,6 +938,7 @@ $(function(){
 	initMSOs();
 	initClickEvents();
 	initDataSave();
+		initScaling();
 		setTimeout(function(){checkHashData();},50);
 	setTimeout(function(){initResponsiveLayouts();},50);
 	if(document.readyState === 'complete') { $(window).trigger('docReady'); }
@@ -980,6 +981,38 @@ function addNavProps(){
 	setTimeout(function(){nav.update(getStartPage());},50); /*ensures show() works*/
 }
 
+function initScaling(){
+	if(isLiquid) return;
+	var scaleModeArr = scaleMode.split('_'), useOnMobile = (scaleModeArr.pop() === 'all');
+	window.scaleModeType = scaleModeArr[0];
+	if(!window.scaleModeType) return;
+	if(pre === '-webkit-'){
+		$('.page').each(function(index,elem){
+			$(elem).find('video').parents('.pageItem').addClass('vid-scaled').first().nextAll('.pageItem').wrap('<div class="pageItem vid-over"></div>');
+		});
+		$('.vid-over').css('-webkit-transform','translateZ(0)');
+	}
+	$body = $(document.body).attr('data-page-mode',pageMode);
+	if(useOnMobile || !(isAndroid || isIOS || uAgent.indexOf('iemobile')>-1) ){
+		$body.addClass('scaled-'+scaleModeType).attr('data-scaled-to',maxScaleWidth?'mw':scaleModeType[0]);
+		if(flip) {
+			scaleLayoutFunc = scaleFlipLayout;
+		} else {
+			scaleLayoutFunc = scaleLayout;
+			$(document).on('newPage',function(){ scaleLayoutFunc(); });
+		}
+        scaleLayoutFunc();
+        $(window).on('docReady resize orientationchange',function(){ scaleLayoutFunc(); });
+    }
+}
+function scaleLayout(getOnly,sf) {
+	var targ = (multifile || $('.activePage').is(':empty')) ? $('.page') : $('.activePage'), $body = $(document.body),
+	targW = targ.width(), winW = $(window).innerWidth(), scaleFactor = sf||getScaleFactor(targW,targ.height()), 
+	scaledTo = $body.attr('data-scaled-to'), xTrans = scaledTo==='w' || pageMode==='csh' ? 0 : (winW-(targW*scaleFactor))*.5;
+	if(getOnly) return scaleFactor;
+	$('#container').css(prefix.css+'transform', 'translateX('+xTrans+'px) scale('+scaleFactor+','+scaleFactor+')').css(prefix.css+'transform-origin','0 0 0');
+	if(!getOnly && !sf) $('body').removeClass('zoomed');
+}
 function scaleFlipLayout(getOnly,sf) {
 	var targW = $sl.turn('display') == 'single' ? pageW :pageW*2,scaleFactor=sf||getScaleFactor(targW,pageH);
 	if(getOnly) return scaleFactor;
