@@ -31,7 +31,7 @@ var prefix = (function () {
 var pre = (document.createElement('div').style['WebkitTransform'] != undefined) ? '-webkit-' : '';
 var useSwipe = true;
 var pageMode = 'h';
-var pageW = 1372, pageH = 970;
+var pageW = 1191, pageH = 842;
 var multifile = false;
 if(multifile) { 
 	$('html').addClass('multifile'); 
@@ -54,8 +54,8 @@ var interactiveSelectors = 'a,button,input,select,textarea,.mejs-overlay-button,
 var sliderSettings = {}, nav = {}, in5 = {layouts:[
  	{
  		"class": "mq-none mq-default",
- 		"width": 1372,
- 		"height": 970,
+ 		"width": 1190.5511811,
+ 		"height": 841.889763778,
  		"default": true
  	}
  ]},
@@ -951,7 +951,7 @@ function getOrientation() {
 }
 
 function addNavProps(){
-	if(nav.numPages === undefined) nav.numPages=4;
+	if(nav.numPages === undefined) nav.numPages=5;
 	nav.rtl = $('#slider').attr('data-dir') == 'rtl';
 	if(nav.rtl) $('html').attr('data-dir', 'rtl');
 	nav.init = function() { setTimeout(function(){nav.to(getStartPage());},1); };
